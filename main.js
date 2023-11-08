@@ -15,16 +15,24 @@ Renderer.setSize(window.innerWidth,window.innerHeight)
 
 document.body.appendChild(Renderer.domElement)
 
-//Activitat orbitals
+
+const textureLoader = new THREE.TextureLoader()
+
+//cream textura per la Lluna amb imatges
+
+const albedoMoon = "textures/moonTexture/textures/albedoMoon.jpg"
+const normalMoon = "textures/moonTexture/textures/normalMoon.jpg"
+const bumpMoon = "textures/moonTexture/textures/bumpMoon.jpg"
+
+const albedoTexture = textureLoader.load(albedoMoon)
+const normalTexture = textureLoader.load(normalMoon)
 
 //cream l'array d'objects per fer que tots el objectes rotin i orbitin
 const objects = [];
 
 //geometria de les esferes
 const radius = 1;
-const widthSegments = 6;
-const heightSegments = 6;
-const sphereGeometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+const sphereGeometry = new THREE.SphereGeometry(radius);
 
 //objecte buit per tenir òrbites al Sol
 const solarSystem = new THREE.Object3D();
@@ -32,18 +40,18 @@ Scene.add(solarSystem);
 objects.push(solarSystem);
 
 //cream el Sol, li donam un material, el feim més gran, el feim fill del sistema solar i l'afegim a l'array d'objects
-const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});
+const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00, emissiveIntensity: 1000 });
 const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
 sunMesh.scale.set(5, 5, 5);
 solarSystem.add(sunMesh);
 
 //afegim un llum per veure millor
-{
-    const PLcolor = 0xFFFFFF;
-    const PLintensity = 3;
-    const pointLight = new THREE.PointLight(PLcolor, PLintensity);
-    Scene.add(pointLight);
-  }
+// {
+//     const PLcolor = 0xFFFFFF;
+//     const PLintensity = 3;
+//     const pointLight = new THREE.PointLight(PLcolor, PLintensity);
+//     Scene.add(pointLight);
+//   }
 //afegim la càmera
 const Camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 Camera.position.set(0, 50, 0);
@@ -67,7 +75,11 @@ moonOrbit.position.x = 2;
 earthOrbit.add(moonOrbit);
 
 //cream la Lluna, li donam un materal, la feim més petita
-const moonMaterial = new THREE.MeshPhongMaterial({color: 0x888888, emissive: 0x222222});
+//const moonMaterial = new THREE.MeshPhongMaterial({color: 0x888888, emissive: 0x222222});
+const moonMaterial = new THREE.MeshStandardMaterial({
+  map: albedoTexture,
+  normalMap: normalTexture,
+});
 const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
 moonMesh.scale.set(.5, .5, .5);
 moonOrbit.add(moonMesh);
