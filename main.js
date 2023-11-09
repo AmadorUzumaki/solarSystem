@@ -25,27 +25,33 @@ const environmentMap = cubeTextureLoader.load([
   'textures/environmentMaps/NightSky/nz.png'
 ])
 
-Scene.background =environmentMap
+Scene.background = environmentMap
 
 //fer un spotlight damunt el sistema solar per fer que faci ombres
 const ssSpotLight = new THREE.SpotLight()
 ssSpotLight.position.y = 50
-ssSpotLight.intensity = 100
+ssSpotLight.intensity = 1
+ssSpotLight.castShadow = true
 Scene.add(ssSpotLight)
 
 const ssSpotLightHelper = new THREE.SpotLightHelper( ssSpotLight );
 Scene.add(ssSpotLightHelper);
 
-//fer un pla on es castearà la ombra del sistema solar (el pla no està ben col·locat perquè no el consegueix rotar com toca)
+const ssShadowHelper = new THREE.CameraHelper( ssSpotLight.shadow.camera );
+Scene.add( ssShadowHelper );
 
-const planeMaterial = new THREE.MeshBasicMaterial(0xFF00FF)
-const planeGeometry = new THREE.PlaneGeometry()
-const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
-planeMesh.scale.set(10, 10, 10)
-planeMesh.position.y = -10
-//planeMesh.rotateZ(-Math.PI)
-//planeMesh.scale.set(20, 0, 20)
-Scene.add(planeMesh)
+//fer un pla on es castearà la ombra del sistema solar
+
+const planeGeo = new THREE.PlaneGeometry(100, 100)
+const planeMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff
+})
+const plane = new THREE.Mesh(planeGeo, planeMat)
+plane.position.y = -10
+plane.rotation.x = Math.PI * -0.5
+plane.receiveShadow = true;
+Scene.add(plane)
+
 
 document.body.appendChild(Renderer.domElement)
 
@@ -65,7 +71,7 @@ const bumpTexture = textureLoader.load(bumpMoon)
 //creat textura per Mart amb imatges
 
 const albedoMars = "textures/marsTexture/textures/red_sand_diff_2k.jpg"
-const normalMars = "textures/marsTexture/textures/red_sand_nor_2k.jpg"
+const normalMars = "textures/marsTexture/textures/red_sand_nor_gl_2k.jpg"
 const armMars = "textures/marsTexture/textures/red_sand_arm_2k.jpg"
 
 const albedoMTexture = textureLoader.load(albedoMars)
@@ -90,7 +96,10 @@ objects.push(solarSystem);
 const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00, emissiveIntensity: 1000 });
 const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
 sunMesh.scale.set(5, 5, 5);
+sunMesh.castShadow = true
 solarSystem.add(sunMesh);
+
+ssSpotLight.target = sunMesh
 
 //afegim un llum per veure millor
 // {
