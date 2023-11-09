@@ -13,12 +13,46 @@ const far = 1000
 const Renderer = new THREE.WebGL1Renderer()
 Renderer.setSize(window.innerWidth,window.innerHeight)
 
+//cubeMap creat i col·locat
+
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+const environmentMap = cubeTextureLoader.load([
+  'textures/environmentMaps/NightSky/px.png',
+  'textures/environmentMaps/NightSky/nx.png',
+  'textures/environmentMaps/NightSky/py.png',
+  'textures/environmentMaps/NightSky/ny.png',
+  'textures/environmentMaps/NightSky/pz.png',
+  'textures/environmentMaps/NightSky/nz.png'
+])
+
+Scene.background =environmentMap
+
+//fer un spotlight damunt el sistema solar per fer que faci ombres
+const ssSpotLight = new THREE.SpotLight()
+ssSpotLight.position.y = 50
+ssSpotLight.intensity = 100
+Scene.add(ssSpotLight)
+
+const ssSpotLightHelper = new THREE.SpotLightHelper( ssSpotLight );
+Scene.add(ssSpotLightHelper);
+
+//fer un pla on es castearà la ombra del sistema solar (el pla no està ben col·locat perquè no el consegueix rotar com toca)
+
+const planeMaterial = new THREE.MeshBasicMaterial(0xFF00FF)
+const planeGeometry = new THREE.PlaneGeometry()
+const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
+planeMesh.scale.set(10, 10, 10)
+planeMesh.position.y = -10
+//planeMesh.rotateZ(-Math.PI)
+//planeMesh.scale.set(20, 0, 20)
+Scene.add(planeMesh)
+
 document.body.appendChild(Renderer.domElement)
 
 
 const textureLoader = new THREE.TextureLoader()
 
-//cream textura per la Lluna amb imatges
+//crear textura per la Lluna amb imatges
 
 const albedoMoon = "textures/moonTexture/textures/albedoMoon.jpg"
 const normalMoon = "textures/moonTexture/textures/normalMoon.jpg"
@@ -26,6 +60,19 @@ const bumpMoon = "textures/moonTexture/textures/bumpMoon.jpg"
 
 const albedoTexture = textureLoader.load(albedoMoon)
 const normalTexture = textureLoader.load(normalMoon)
+const bumpTexture = textureLoader.load(bumpMoon)
+
+//creat textura per Mart amb imatges
+
+const albedoMars = "textures/marsTexture/textures/red_sand_diff_2k.jpg"
+const normalMars = "textures/marsTexture/textures/red_sand_nor_2k.jpg"
+const armMars = "textures/marsTexture/textures/red_sand_arm_2k.jpg"
+
+const albedoMTexture = textureLoader.load(albedoMars)
+const normalMTexture = textureLoader.load(normalMars)
+const aoMTexture = textureLoader.load(armMars)
+const roughMTexture = textureLoader.load(armMars)
+const metalMTexture = textureLoader.load(armMars)
 
 //cream l'array d'objects per fer que tots el objectes rotin i orbitin
 const objects = [];
@@ -65,8 +112,9 @@ solarSystem.add(earthOrbit);
 objects.push(earthOrbit);
 
 //cream la Terra, li donam un material, i la feim filla de la seva òrbita
-const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMaterial = new THREE.MeshStandardMaterial({color: 0x2233FF});
 const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+earthMesh.receiveShadow = true
 earthOrbit.add(earthMesh);
 
 //cream una òrbita por la lluna y la feim filla de l'òrbita de la Terra
@@ -79,10 +127,33 @@ earthOrbit.add(moonOrbit);
 const moonMaterial = new THREE.MeshStandardMaterial({
   map: albedoTexture,
   normalMap: normalTexture,
+  bumpMap: bumpTexture
+
 });
 const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
+moonMesh.castShadow = true;
 moonMesh.scale.set(.5, .5, .5);
 moonOrbit.add(moonMesh);
+
+//llum per fer que la Lluna pugui tenir ombra a la Terra (la càmara de ombres no apunta on toca)
+
+const spotLight = new THREE.SpotLight(0xFFFFFF)
+spotLight.angle = Math.PI/8
+spotLight.position.x = 2
+spotLight.intensity = 5
+spotLight.target = moonMesh
+spotLight.castShadow = true
+spotLight.shadow.camera.position.x = 2
+spotLight.add(spotLight.shadow.camera)
+moonOrbit.add(spotLight)
+
+//helpers per veure on apunta l'spotlight i la càmara d'ombres
+const spotLightHelper = new THREE.SpotLightHelper( spotLight );
+Scene.add( spotLightHelper );
+
+const shadowHelper = new THREE.CameraHelper( spotLight.shadow.camera );
+Scene.add( shadowHelper );
+
 
 //objecte buit per tenir òrbita a Mart y la feim filla de l'òrbita del sistema Solar
 
@@ -93,7 +164,15 @@ objects.push(marsOrbit);
 
 //cream Mart, li donam un material, i el feim fill de la seva òrbita
 
-const marsMaterial = new THREE.MeshPhongMaterial({color: 0xA1251B, emissive: 0x222222});
+//const marsMaterial = new THREE.MeshPhongMaterial({color: 0xA1251B, emissive: 0x222222});
+const marsMaterial = new THREE.MeshStandardMaterial({
+    map: albedoMTexture,
+    normalMap: normalMTexture,
+    aoMap: aoMTexture,
+    roughnessMap: roughMTexture,
+    metalnessMap: metalMTexture
+  
+  });
 const marsMesh = new THREE.Mesh(sphereGeometry, marsMaterial);
 marsOrbit.add(marsMesh);
 
