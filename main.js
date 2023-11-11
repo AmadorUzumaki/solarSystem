@@ -39,6 +39,8 @@ Scene.add(ssSpotLightHelper);
 
 const ssShadowHelper = new THREE.CameraHelper( ssSpotLight.shadow.camera );
 Scene.add( ssShadowHelper );
+ssShadowHelper.position.y = 2
+ssSpotLight.add(ssShadowHelper)
 
 //fer un pla on es castearà la ombra del sistema solar
 
@@ -91,6 +93,9 @@ const sphereGeometry = new THREE.SphereGeometry(radius);
 const solarSystem = new THREE.Object3D();
 Scene.add(solarSystem);
 objects.push(solarSystem);
+
+//la càmara d'ombres no apunta on toca
+ssSpotLight.target = solarSystem
 
 //cream el Sol, li donam un material, el feim més gran, el feim fill del sistema solar i l'afegim a l'array d'objects
 const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00, emissiveIntensity: 1000 });
