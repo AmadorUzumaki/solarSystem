@@ -115,10 +115,10 @@ ssSpotLight.target = sunMesh
 //     Scene.add(pointLight);
 //   }
 //afegim la càmera
-const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.set(0, 10, -5);
-camera.up.set(0, 0, 1);
-camera.lookAt(0, 0, 0);
+const Camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+Camera.position.set(0, 10, -5);
+Camera.up.set(0, 0, 1);
+Camera.lookAt(0, 0, 0);
 
 //objecte buit per tenir òrbita a la Terra y la feim filla de l'òrbita del sistema Solar
 const earthOrbit = new THREE.Object3D();
@@ -227,7 +227,7 @@ solarSystem.add(jupiterOrbit);
 objects.push(jupiterOrbit);
 
 const ambientLight = new THREE.AmbientLight();
-scene.add(ambientLight);
+Scene.add(ambientLight);
 //cream Júpiter, li donam un material, i el feim fill de la seva òrbita
 
 const jupiterMaterial = new THREE.MeshPhongMaterial({color: 0xFFFFFF, emissive: 0x222222});
