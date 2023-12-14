@@ -11,7 +11,7 @@ const aspect = window.innerWidth/window.innerHeight
 const near = 0.1
 const far = 1000
 
-const Renderer = new THREE.WebGL1Renderer()
+const Renderer = new THREE.WebGLRenderer()
 Renderer.setSize(window.innerWidth,window.innerHeight)
 
 //cubeMap creat i col·locat
@@ -31,7 +31,8 @@ Scene.background = environmentMap
 //fer un spotlight damunt el sistema solar per fer que faci ombres
 const ssSpotLight = new THREE.SpotLight()
 ssSpotLight.position.y = 50
-ssSpotLight.intensity = 1
+ssSpotLight.intensity = 100
+ssSpotLight.angle = Math.PI/4;
 ssSpotLight.castShadow = true
 Scene.add(ssSpotLight)
 
@@ -130,6 +131,7 @@ objects.push(earthOrbit);
 const earthMaterial = new THREE.MeshStandardMaterial({color: 0x2233FF});
 const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
 earthMesh.receiveShadow = true
+earthMesh.castShadow = true
 earthOrbit.add(earthMesh);
 
 //cream una òrbita por la lluna y la feim filla de l'òrbita de la Terra
@@ -189,6 +191,7 @@ const marsMaterial = new THREE.MeshStandardMaterial({
   
   });
 const marsMesh = new THREE.Mesh(sphereGeometry, marsMaterial);
+marsMesh.castShadow = true;
 marsOrbit.add(marsMesh);
 
 //objecte buit per tenir òrbita a Fobos y la feim filla de l'òrbita de Mart
@@ -203,6 +206,7 @@ objects.push(phobosOrbit);
 const phobosMaterial = new THREE.MeshPhongMaterial({color: 0x88FF88, emissive: 0x222222});
 const phobosMesh = new THREE.Mesh(sphereGeometry, phobosMaterial);
 phobosMesh.scale.set(.75, .75, .75);
+phobosMesh.castShadow = true;
 phobosOrbit.add(phobosMesh);
 
 //objecte buit per tenir òrbita a Deimos y la feim filla de l'òrbita de Mart
@@ -217,6 +221,7 @@ objects.push(deimosOrbit);
 const deimosMaterial = new THREE.MeshPhongMaterial({color: 0xFF8888, emissive: 0x222222});
 const deimosMesh = new THREE.Mesh(sphereGeometry, deimosMaterial);
 deimosMesh.scale.set(.5, .5, .5);
+deimosMesh.castShadow = true;
 deimosOrbit.add(deimosMesh);
 
 //objecte buit per tenir òrbita a Júpiter y la feim filla de l'òrbita del sistema Solar
@@ -227,12 +232,13 @@ solarSystem.add(jupiterOrbit);
 objects.push(jupiterOrbit);
 
 const ambientLight = new THREE.AmbientLight();
-Scene.add(ambientLight);
+//Scene.add(ambientLight);
 //cream Júpiter, li donam un material, i el feim fill de la seva òrbita
 
 const jupiterMaterial = new THREE.MeshPhongMaterial({color: 0xFFFFFF, emissive: 0x222222});
 const jupiterMesh = new THREE.Mesh(sphereGeometry, jupiterMaterial);
 jupiterMesh.scale.set(3, 3, 3);
+//jupiterMesh.castShadow = true;
 //jupiterOrbit.add(jupiterMesh);
 
 //aprofitam l'òrbita de Júpiter per afegir coses de Halloween
@@ -250,6 +256,7 @@ function ImportSkull(){
 
         function (gltf) {
             skull = gltf.scene;
+            skull.castShadow = true;
             jupiterOrbit.add(skull);
         },
         function(xhr){
